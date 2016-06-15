@@ -7,10 +7,15 @@
     "npm": "3.x.x"
   },
   "scripts": {
-    "test": "node test"
+    "test": "node test",
+    "start": "node index"
   },
   "dependencies": {
-    "express": "^4.13.4"
+    "body-parser": "^1.15.1",
+    "cors": "^2.7.1",
+    "express": "^4.13.4",
+    "node-sass": "^3.7.0",
+    "sanitize.css": "^3.3.0"
   },
   "devDependencies": {
     "sass-thematic": "^2.0.4",
