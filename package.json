@@ -1,0 +1,20 @@
+{
+  "name": "sassyguide",
+  "version": "0.0.0",
+  "main": "index.js",
+  "engines": {
+    "node": "5.x.x",
+    "npm": "3.x.x"
+  },
+  "scripts": {
+    "test": "node test"
+  },
+  "dependencies": {
+    "express": "^4.13.4"
+  },
+  "devDependencies": {
+    "sass-thematic": "^2.0.4",
+    "supertest": "^1.2.0",
+    "tape": "^4.5.1"
+  }
+}
