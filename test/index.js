@@ -2,18 +2,16 @@
 
 var test = require('tape');
 var request = require('supertest');
-var app = require('../server');
+var proj = require('../src');
 
 test('Correct users returned', function (t) {
-  request(app)
-    .get('/api/json_style')
-    .expect('Content-Type', /json/)
-    .expect(200)
-    .end(function (err, res) {
-      // var expectedUsers = ['John', 'Betty', 'Hal'];
+  const parse = proj.componentCssBase(__dirname + '/fixture/component.scss');
 
-      t.error(err, 'No error');
-      // t.same(res.body, expectedUsers, 'Users as expected');
-      t.end();
-    });
+  
+
+  console.log("parse = %j", parse(__dirname + '/fixture/utility.scss'))
+
+  // t.error(err, 'No error');
+  // t.same(res.body, expectedUsers, 'Users as expected');
+  t.end();
 });
