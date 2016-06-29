@@ -1,11 +1,8 @@
-const gonzales = require('gonzales-pe');
 const fs = require('fs');
-
 var sass = require('node-sass');
-var read = fs.readFileSync;
-
 var css = require('css');
 var entries = require('object.entries');
+
 if (!Object.entries) { entries.shim(); }
 
 const filterArray = [
@@ -27,35 +24,23 @@ const constructTree = (partsArray) =>
       const tree = constructTree(pair[1]
         .map((ele) => ele.slice(1))
         .filter((ele) => ele.length));
-
       return Object.assign({name: pair[0]}, tree.length ? {data: tree} : {})
     });
 
-
-// .default { 
-//   &.Component { 
-//     /* empty */ 
-//   } 
-// }
 const createDefaultComponentDefault = (classNames, defaultString) => 
   `${defaultString} { ${classNames.map((name) => `&${name} { /* empty */ }`).join(" ") } }`;
 
-// .Component {
-//   @extend .Component.default
-// }
 const createDefaultGlue = (classNames, defaultString) => 
   classNames.map((name) => `${name} { @extend ${name}${defaultString}; }`).join(" ");
 
-const classNamesWrapper = (componentCss, classNames) => (utilityCssPath) => {
+const classNamesWrapper = (componentCss, classNames) => (utilityCssPath, mapping) => {
   const utilityCss = fs.readFileSync(utilityCssPath, "utf-8");
 
-  const defaultDefault = createDefaultComponentDefault(classNames, ".default")
+  const defaultDefault = createDefaultComponentDefault(classNames, ".default");
   const defaultGlue = createDefaultGlue(classNames, ".default");
 
-  const defaultScssBlob = `${defaultDefault} ${defaultGlue}`;
-
-  return sass.renderSync({data: `${componentCss} ${defaultScssBlob} ${utilityCss}`}).css.toString();
-}
+  return sass.renderSync({data: `${componentCss} ${defaultDefault} ${defaultGlue} ${mapping === true ? utilityCss : ""}`}).css.toString();
+};
 
 module.exports = {
   componentCssBase: (componentCSSPath) => {
@@ -74,6 +59,6 @@ module.exports = {
     const resTree = constructTree(selParts);
     const classNames = resTree.map((sel) => sel.name);
 
-    return classNamesWrapper(componentCss, classNames);
+    return {classNames: classNames, parse: classNamesWrapper(componentCss, classNames)};
   }
 };
