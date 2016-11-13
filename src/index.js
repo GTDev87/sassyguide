@@ -33,8 +33,23 @@ const createDefaultComponentDefault = (classNames, defaultString) =>
 const createDefaultGlue = (classNames, defaultString) => 
   classNames.map((name) => `${name} { @extend ${name}${defaultString}; }`).join(" ");
 
+const getClassnamesFromStyleSheet = (cssData) => {
+  var result = css.parse(cssData)
+    .stylesheet
+    .rules
+    .map((rule) => rule.selectors)
+    .filter(filters)
+    .map((sel) => sel[0]);
+
+  const selParts = result.map((ele) => ele.split(' '));    
+  const resTree = constructTree(selParts);
+  return resTree.map((sel) => sel.name);
+};
+
+const styleFileToCSS = (cssPath) => sass.renderSync({data: fs.readFileSync(cssPath, "utf-8")}).css.toString();
+
 const classNamesWrapper = (componentCss, classNames) => (utilityCssPath, mapping) => {
-  const utilityCss = fs.readFileSync(utilityCssPath, "utf-8");
+  const utilityCss = styleFileToCSS(utilityCssPath);
 
   const defaultDefault = createDefaultComponentDefault(classNames, ".default");
   const defaultGlue = createDefaultGlue(classNames, ".default");
@@ -44,21 +59,18 @@ const classNamesWrapper = (componentCss, classNames) => (utilityCssPath, mapping
 
 module.exports = {
   componentCssBase: (componentCSSPath) => {
-    const componentCssFile = fs.readFileSync(componentCSSPath, "utf-8");
-
-    const componentCss = sass.renderSync({data: componentCssFile}).css.toString();
-
-    var result = css.parse(componentCss)
-      .stylesheet
-      .rules
-      .map((rule) => rule.selectors)
-      .filter(filters)
-      .map((sel) => sel[0]);
-
-    const selParts = result.map((ele) => ele.split(' '));    
-    const resTree = constructTree(selParts);
-    const classNames = resTree.map((sel) => sel.name);
+    const componentCss = styleFileToCSS(componentCSSPath);
+    const classNames = getClassnamesFromStyleSheet(componentCss);
 
     return {classNames: classNames, parse: classNamesWrapper(componentCss, classNames)};
+  },
+  getClassnamesFromStyleSheet,
+  generateUtilityCss: (utilityCssPath, mapping) => {
+    const utilityCss = styleFileToCSS(utilityCssPath);
+
+    const defaultDefault = createDefaultComponentDefault(classNames, ".default");
+    const defaultGlue = createDefaultGlue(classNames, ".default");
+
+    return `${defaultDefault} ${defaultGlue} ${mapping === true ? utilityCss : ""}`;
   }
 };

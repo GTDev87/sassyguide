@@ -6,13 +6,9 @@ var proj = require('../src');
 
 test('Correct users returned', function (t) {
   const parse = proj.componentCssBase(__dirname + '/fixture/component.scss');
-
   const mapping = {};
-
   const classNames = parse.classNames;
-
-
-  const css = parse.parse(__dirname + '/fixture/utility.scss', true);
+  const css = parse.parse(__dirname + '/fixture/utility.scss', mapping);
 
   console.log("css = %j", css);
 
